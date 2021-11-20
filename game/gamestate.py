@@ -10,4 +10,8 @@ class GameState:
         self.current_player = current_player
 
     def next_gamesteps(self):
+        # TODO : finir cette fonction de l'enfer
+        next_steps = list()
         pass
+        
+        

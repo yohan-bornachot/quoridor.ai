@@ -1,10 +1,11 @@
 import numpy as np
 class Player:
 
-    def __init__(self, i, j, nb_walls) -> None:
+    def __init__(self, i, j, nb_walls, goal) -> None:
         self.i = i
         self.j = j
         self.nb_walls = nb_walls
+        self.goal = goal
 
     def possible_right(self, walls):
         board_size = len(walls) + 1
@@ -26,6 +27,7 @@ class Player:
     def get_nb_stick(self):
         return self.nb_walls
 
+    """
     def set_position(self, i, j):
         self.x = i
         self.y = j
@@ -44,3 +46,4 @@ class Player:
 
     def use_stick(self):
         self.nb_walls -= 1
+    """
