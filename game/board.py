@@ -3,6 +3,7 @@ import numpy as np
 class Board:
 
     def __init__(self, board_size, wall_size) -> None:
+        self.board_size = board_size
         self.walls_h = np.zeros((board_size-1, board_size-1))
         self.walls_v = np.zeros((board_size-1, board_size-1))
         self.wall_size = wall_size

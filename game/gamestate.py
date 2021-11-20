@@ -10,4 +10,4 @@ class GameState:
         self.current_player = current_player
 
     def next_gamesteps(self):
-        
+        pass
