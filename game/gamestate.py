@@ -3,11 +3,11 @@ from board import Board
 
 class GameState:
 
-    def __init__(self, size = 9, nb_walls = 10, wall_size = 2) -> None:
-        
-        self.size = size
+    def __init__(self, player1, player2, board, current_player = 1) -> None:
+        self.player1 = player1
+        self.player2 = player2
+        self.board = board
+        self.current_player = current_player
 
-        self.current_player = 0
-        self.player0 = Player(0, self.size/2+1, nb_walls)
-        self.player1 = Player(self.size, self.size/2+1, nb_walls)
-        self.board = Board(self.size)
+    def next_gamesteps(self):
+        

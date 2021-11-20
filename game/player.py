@@ -1,3 +1,4 @@
+import numpy as np
 class Player:
 
     def __init__(self, i, j, nb_walls) -> None:
@@ -6,16 +7,18 @@ class Player:
         self.nb_walls = nb_walls
 
     def possible_right(self, walls):
-        pass #TODO
+        board_size = len(walls) + 1
+        return (self.j<board_size and walls[self.i, self.j] == 0 and (self.i == 0 or walls[self.i-1,self.j]==0))
 
     def possible_left(self, walls):
-        pass #TODO
+        return (self.j>0 and walls[self.i, self.j-1] == 0 and (self.i == 0 or walls[self.i-1,self.j-1]==0))
 
     def possible_up(self, walls):
-        pass #TODO
+        return (self.i>0 and walls[self.i-1, self.j] == 0 and (self.j == 0 or walls[self.i-1,self.j-1]==0))
 
     def possible_down(self, walls):
-        pass #TODO
+        board_size = len(walls) + 1
+        return (self.i<board_size and walls[self.i, self.j] == 0 and (self.j == 0 or walls[self.i,self.j-1]==0))
 
     def get_position(self):
         return self.i, self.j
