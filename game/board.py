@@ -7,6 +7,7 @@ class Board:
         self.walls_h = np.zeros((board_size-1, board_size-1))
         self.walls_v = np.zeros((board_size-1, board_size-1))
         self.wall_size = wall_size
+        
 
     def possible_h_wall(self, i, j):
         # TODO : utiliser wall_size pour ne pas checker que des murs de taille 2
