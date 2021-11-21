@@ -28,25 +28,16 @@ class Quoridor:
 
         self.game_state = GameState(player1, player2, board, self.size-1, self.size-1,  current_player)
 
-    def game_over(self):
-        if self.game_state.player1.i == self.game_state.player1.goal :
-            return 1
-        
-        if self.game_state.player2.i == self.game_state.player2.goal :
-            return 2
-        
-        return 0
-
     def play(self, verbose = True):
         self.game_start = time()
 
-        while self.game_over() == 0:
+        while not self.game_state.is_terminal():
 
             self.nb_step += 1
             
             if verbose : 
                 display_board(self.game_state)
-                #sleep(0.1)
+                sleep(0.1)
 
             next_states = self.game_state.next_gamestates()
             current_player = self.game_state.current_player
@@ -65,7 +56,10 @@ class Quoridor:
         self.game_stop = time()
 
     def get_winner(self):
-        return self.game_over()
+        if self.game_state.player1.i == self.game_state.player1.goal :
+            return 1
+        if self.game_state.player2.i == self.game_state.player2.goal :
+            return 2
 
     def get_nb_step(self):
         return self.nb_step
@@ -79,9 +73,9 @@ if __name__ == "__main__":
     parser.add_argument("--ai2", default="random", choices=ai_types, help="player2 AI to be implemented")
     args = parser.parse_args()
 
-    for _ in range(20):
+    for _ in range(1):
         q = Quoridor(args.ai1, args.ai2)
-        q.play()
+        q.play(verbose=True)
 
         print("Winner is player : {}. Number of steps : {}. Temps joué {}".format(q.get_winner(),q.get_nb_step(), q.game_stop-q.game_start))
         print("Mean time by step : {}".format((q.game_stop-q.game_start)/q.nb_step))
