@@ -1,18 +1,20 @@
 import numpy as np
 
 def up(i, j, walls):
-    return i>0 and walls[i-1, j] == 0 and (j == 0 or walls[i-1,j-1]==0)
+    size = len(walls) + 1
+    return i>0 and (j == size-1 or walls[i-1, j] == 0) and (j == 0 or walls[i-1,j-1]==0)
 
 def down(i, j, walls):
     size = len(walls) + 1
-    return i<size-1 and walls[i+1, j] == 0 and (j == 0 or walls[i,j-1]==0)
+    return i<size-1 and (j == size-1 or walls[i, j] == 0) and (j == 0 or walls[i,j-1]==0)
 
 def right(i, j, walls):
     size = len(walls) + 1
-    return j<size-1 and walls[i, j+1] == 0 and (i == 0 or walls[i-1,j]==0)
+    return j<size-1 and (i == size-1 or walls[i, j] == 0) and (i == 0 or walls[i-1,j]==0)
 
 def left(i, j, walls):
-    return j>0 and walls[i, j-1] == 0 and (i == 0 or walls[i-1,j-1]==0)
+    size = len(walls) + 1
+    return j>0 and (i == size-1 or walls[i, j-1] == 0) and (i == 0 or walls[i-1,j-1]==0)
 
 def course_in_width(i, j, walls_h, walls_v, goal):
     size = len(walls_h) + 1

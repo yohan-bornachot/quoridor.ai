@@ -1,4 +1,4 @@
-from ai import AI
+from .ai import AI
 from random import randint
 
 class RandomAI(AI):

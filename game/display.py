@@ -3,7 +3,7 @@ from gamestate import GameState
 from player import Player
 from board import Board
 
-def display_board(game_state: GameState=GameState(9, 10, 2)) -> None:
+def display_board(game_state: GameState) -> None:
     # Taille du plateau
     size = len(game_state.board.walls_h)+1
 
@@ -129,6 +129,6 @@ if __name__== "__main__":
     board = Board(board_size=9, wall_size=2)
     board.set_v_wall(1, 1)
     board.set_h_wall(0, 0)
-    game_state = GameState(player1, player2, board)
+    game_state = GameState(player1, player2, board, size, size)
 
     display_board(game_state)

@@ -1,4 +1,4 @@
-from ..AI.random import RandomAI
+from AI.random import RandomAI
 
 class AIPlayer:
 

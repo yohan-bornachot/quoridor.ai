@@ -1,6 +1,8 @@
 import sys
 import numpy as np
 
+from time import sleep
+
 from player import Player
 from board import Board
 from gamestate import GameState
@@ -16,8 +18,8 @@ class Quoridor:
         self.size = size
 
         current_player = 1
-        player1 = Player(0, self.size/2+1, nb_walls, self.size)
-        player2 = Player(self.size, self.size/2+1, nb_walls, 0)
+        player1 = Player(0, self.size//2, nb_walls, self.size-1)
+        player2 = Player(self.size-1, self.size//2, nb_walls, 0)
         board = Board(self.size, wall_size, np.zeros((size-1, size-1)), np.zeros((size-1, size-1)))
 
         self.ai1 = AIPlayer(ai1)
@@ -41,10 +43,13 @@ class Quoridor:
 
             self.nb_step += 1
             
-            if verbose : display_board(self.game_state)
+            if verbose : 
+                display_board(self.game_state)
+                sleep(0.1)
 
             next_states = self.game_state.next_gamestates()
             current_player = self.game_state.current_player
+
 
             if current_player == 1:
                 next_step = self.ai1.select_next_step(next_states)
@@ -52,6 +57,8 @@ class Quoridor:
             if current_player == 2:
                 next_step = self.ai2.select_next_step(next_states)
 
+            print(next_step.objectiv1)
+            print(next_step.objectiv2)
             self.game_state = next_step
 
         if verbose : display_board(self.game_state)
