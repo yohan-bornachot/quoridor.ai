@@ -23,7 +23,7 @@ def course_in_width(i, j, walls_h, walls_v, goal):
     stack = list()
     stack.append((i,j))
 
-    while len(stack)>0 and np.max(course[goal]) == 0:
+    while len(stack)>0 and np.max(course[goal]) == 0: 
         current_stack = stack.copy()
         stack = list()
 

@@ -75,26 +75,30 @@ class Player(Subplayer):
     def is_opponent_right(self, walls:np.ndarray, opponent:Subplayer) -> bool:
         """This function returns True if the opponent is just at the right of the current pawn
         and if there is no wall between them."""
+        board_size = len(walls) + 1
         return (self.i==opponent.i and self.j==opponent.j-1 and 
-                walls[self.i, self.j]==0 and walls[self.i-1, self.j]==0)
+                (self.i == board_size-1 or walls[self.i, self.j]==0) and walls[self.i-1, self.j]==0)
     
     def is_opponent_left(self, walls:np.ndarray, opponent:Subplayer) -> bool:
         """This function returns True if the opponent is just at the left of the current pawn
         and if there is no wall between them."""
+        board_size = len(walls) + 1
         return (self.i==opponent.i and self.j==opponent.j+1 and 
-                walls[self.i, self.j-1]==0 and walls[self.i-1, self.j-1]==0)
+                (self.i == board_size-1 or walls[self.i, self.j-1]==0) and walls[self.i-1, self.j-1]==0)
 
     def is_opponent_up(self, walls:np.ndarray, opponent:Subplayer) -> bool:
         """This function returns True if the opponent is just above the current pawn
         and if there is no wall between them."""
+        board_size = len(walls) + 1
         return (self.i==opponent.i+1 and self.j==opponent.j and 
-                walls[self.i-1, self.j]==0 and walls[self.i-1, self.j-1]==0)
+                (self.j == board_size-1 or  walls[self.i-1, self.j]==0) and walls[self.i-1, self.j-1]==0)
     
     def is_opponent_down(self, walls:np.ndarray, opponent:Subplayer) -> bool:
         """This function returns True if the opponent is just under the current pawn
         and if there is no wall between them."""
+        board_size = len(walls) + 1
         return (self.i==opponent.i-1 and self.j==opponent.j and 
-                walls[self.i, self.j]==0 and walls[self.i, self.j-1]==0)
+                (self.j == board_size-1 or walls[self.i, self.j]==0) and walls[self.i, self.j-1]==0)
     
     def possible_jump_right(self, walls: np.ndarray, opponent: Subplayer) -> bool:
         """This function tests if it is possible to jump over the opponent pawn towards right"""

@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import argparse
 
-from time import sleep
+from time import sleep, time
 
 from player import Player
 from board import Board
@@ -13,7 +13,6 @@ from display import display_board
 class Quoridor:
 
     def __init__(self, ai1, ai2, size = 9, nb_walls = 10, wall_size = 2) -> None:
-        
         self.nb_step = 0
 
         self.size = size
@@ -39,6 +38,7 @@ class Quoridor:
         return 0
 
     def play(self, verbose = True):
+        self.game_start = time()
 
         while self.game_over() == 0:
 
@@ -46,7 +46,7 @@ class Quoridor:
             
             if verbose : 
                 display_board(self.game_state)
-                sleep(0.1)
+                #sleep(0.1)
 
             next_states = self.game_state.next_gamestates()
             current_player = self.game_state.current_player
@@ -58,11 +58,11 @@ class Quoridor:
             if current_player == 2:
                 next_step = self.ai2.select_next_step(next_states)
 
-            print(next_step.objectiv1)
-            print(next_step.objectiv2)
             self.game_state = next_step
 
         if verbose : display_board(self.game_state)
+
+        self.game_stop = time()
 
     def get_winner(self):
         return self.game_over()
@@ -79,8 +79,10 @@ if __name__ == "__main__":
     parser.add_argument("--ai2", default="random", choices=ai_types, help="player2 AI to be implemented")
     args = parser.parse_args()
 
-    q = Quoridor(args.ai1, args.ai2)
-    q.play()
+    for _ in range(20):
+        q = Quoridor(args.ai1, args.ai2)
+        q.play()
 
-    print("Winner is player : {}. Number of steps : {}".format(q.get_winner(),q.get_nb_step()))
+        print("Winner is player : {}. Number of steps : {}. Temps joué {}".format(q.get_winner(),q.get_nb_step(), q.game_stop-q.game_start))
+        print("Mean time by step : {}".format((q.game_stop-q.game_start)/q.nb_step))
         
