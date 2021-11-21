@@ -1,3 +1,4 @@
+from functools import total_ordering
 import sys
 import numpy as np
 import argparse
@@ -12,18 +13,19 @@ from display import display_board
 
 class Quoridor:
 
-    def __init__(self, ai1, ai2, size = 9, nb_walls = 10, wall_size = 2) -> None:
+    def __init__(self, ai1, ai2, size = 9, nb_walls = 10, wall_size = 2, time_to_play = 5) -> None:
         self.nb_step = 0
 
         self.size = size
+        self.time_to_play = time_to_play
 
         current_player = 1
         player1 = Player(0, self.size//2, nb_walls, self.size-1)
         player2 = Player(self.size-1, self.size//2, nb_walls, 0)
         board = Board(self.size, wall_size, np.zeros((size-1, size-1)), np.zeros((size-1, size-1)))
 
-        self.ai1 = AIPlayer(ai1)
-        self.ai2 = AIPlayer(ai2)
+        self.ai1 = AIPlayer(ai1, play_as=1, time_to_play=time_to_play)
+        self.ai2 = AIPlayer(ai2, play_as=2, time_to_play=time_to_play)
 
 
         self.game_state = GameState(player1, player2, board, self.size-1, self.size-1,  current_player)
@@ -37,7 +39,7 @@ class Quoridor:
             
             if verbose : 
                 display_board(self.game_state)
-                sleep(0.1)
+                #sleep(0.5)
 
             next_states = self.game_state.next_gamestates()
             current_player = self.game_state.current_player
@@ -67,10 +69,10 @@ class Quoridor:
 
 if __name__ == "__main__":
 
-    ai_types = ["random", "minimax"]
+    ai_types = ["random", "minimax", "greedy"]
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ai1", default="minimax", choices=ai_types, help="player1 AI to be implemented")
-    parser.add_argument("--ai2", default="random", choices=ai_types, help="player2 AI to be implemented")
+    parser.add_argument("--ai1", default="greedy", choices=ai_types, help="player1 AI to be implemented")
+    parser.add_argument("--ai2", default="greedy", choices=ai_types, help="player2 AI to be implemented")
     args = parser.parse_args()
 
     for _ in range(1):
