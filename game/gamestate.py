@@ -5,12 +5,12 @@ from board import Board
 
 class GameState:
 
-    def __init__(self, player1, player2, board, objectiv1 , objectiv2, current_player = 1) -> None:
+    def __init__(self, player1, player2, board, objective1 , objective2, current_player = 1) -> None:
         self.player1 = player1
         self.player2 = player2
         self.board = board
-        self.objectiv1 = objectiv1
-        self.objectiv2 = objectiv2
+        self.objective1 = objective1
+        self.objective2 = objective2
         self.current_player = current_player
 
     def next_gamestates(self):
@@ -179,3 +179,6 @@ class GameState:
                                 next_steps.append(GameState(next_player2, next_player1 , next_board, obj2, obj1, next_player))
         
         return next_steps
+    
+    def is_terminal(self):
+        return (self.objective1==0 or self.objective2==0)

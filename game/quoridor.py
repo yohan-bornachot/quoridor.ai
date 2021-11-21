@@ -73,9 +73,9 @@ class Quoridor:
 
 if __name__ == "__main__":
 
-    ai_types = ["random"]
+    ai_types = ["random", "minimax"]
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ai1", default="random", choices=ai_types, help="player1 AI to be implemented")
+    parser.add_argument("--ai1", default="minimax", choices=ai_types, help="player1 AI to be implemented")
     parser.add_argument("--ai2", default="random", choices=ai_types, help="player2 AI to be implemented")
     args = parser.parse_args()
 
@@ -85,4 +85,3 @@ if __name__ == "__main__":
 
         print("Winner is player : {}. Number of steps : {}. Temps joué {}".format(q.get_winner(),q.get_nb_step(), q.game_stop-q.game_start))
         print("Mean time by step : {}".format((q.game_stop-q.game_start)/q.nb_step))
-        
