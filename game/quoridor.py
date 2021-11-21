@@ -1,5 +1,6 @@
 import sys
 import numpy as np
+import argparse
 
 from time import sleep
 
@@ -71,10 +72,14 @@ class Quoridor:
 
 
 if __name__ == "__main__":
-    ai1 = sys.argv[1]
-    ai2 = sys.argv[2]
 
-    q = Quoridor(ai1, ai2)
+    ai_types = ["random"]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ai1", default="random", choices=ai_types, help="player1 AI to be implemented")
+    parser.add_argument("--ai2", default="random", choices=ai_types, help="player2 AI to be implemented")
+    args = parser.parse_args()
+
+    q = Quoridor(args.ai1, args.ai2)
     q.play()
 
     print("Winner is player : {}. Number of steps : {}".format(q.get_winner(),q.get_nb_step()))

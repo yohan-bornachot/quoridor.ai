@@ -31,7 +31,7 @@ def display_board(game_state: GameState) -> None:
                     if (i,j)==(game_state.player2.i,game_state.player2.j):
                         print("  x |", end="")
                     elif (i,j)==(game_state.player1.i,game_state.player1.j):
-                        print("  o  ", end="")
+                        print("  o |", end="")
                     # Si pas de pion (juste un mur)
                     else:
                         print("  . |", end="")
@@ -49,26 +49,56 @@ def display_board(game_state: GameState) -> None:
             print("#", end="") # Début de la ligne
             # Ligne
             for j in range(size):
-                # Si un pion se trouve en (i,j) et qu'il y a un mur vertical qui passe à cet endroit:
-                if (i,j)==(game_state.player1.i,game_state.player1.j) and (game_state.board.walls_v[i, j]==1 or game_state.board.walls_v[i-1, j]==1):
-                    print("  o |", end="")
-                elif (i,j)==(game_state.player2.i,game_state.player2.j) and (game_state.board.walls_v[i, j]==1 or game_state.board.walls_v[i-1, j]==1):
-                    print("  x |", end="")
-                # Si pas de mur, mais pion présent en (i,j)
-                elif (i,j)==(game_state.player1.i,game_state.player1.j):
-                    print("  o  ", end="")
-                elif (i,j)==(game_state.player2.i,game_state.player2.j):
-                    print("  x  ", end="")
-                else: # Si pas de pion
-                    # Si dernière colonne, pas de mur
-                    if j==size-1:
-                        print("  .  ", end="")
+                if j==size-1:
+                    if (i,j)==(game_state.player1.i,game_state.player1.j):
+                        print("  o  ", end="")
+                    elif (i,j)==(game_state.player2.i,game_state.player2.j):
+                        print("  x  ", end="")
                     else:
-                        # Sinon, il peut y avoir un mur, dans ce cas:
-                        if game_state.board.walls_v[i, j]==1 or game_state.board.walls_v[i-1, j]==1:
-                            print("  . |", end="")
-                        else: # Si pas de mur, case basique
-                            print("  .  ", end="")
+                        print("  .  ", end="")
+                else:
+                    if i==0:
+                        # Si un pion se trouve en (i,j) et qu'il y a un mur vertical qui passe à cet endroit:
+                        if (i,j)==(game_state.player1.i,game_state.player1.j) and game_state.board.walls_v[i, j]==1:
+                            print("  o |", end="")
+                        elif (i,j)==(game_state.player2.i,game_state.player2.j) and game_state.board.walls_v[i, j]==1:
+                            print("  x |", end="")
+                        # Si pas de mur, mais pion présent en (i,j)
+                        elif (i,j)==(game_state.player1.i,game_state.player1.j):
+                            print("  o  ", end="")
+                        elif (i,j)==(game_state.player2.i,game_state.player2.j):
+                            print("  x  ", end="")
+                        else: # Si pas de pion
+                            # Si dernière colonne, pas de mur
+                            if j==size-1:
+                                print("  .  ", end="")
+                            else:
+                                # Sinon, il peut y avoir un mur, dans ce cas:
+                                if game_state.board.walls_v[i, j]==1:
+                                    print("  . |", end="")
+                                else: # Si pas de mur, case basique
+                                    print("  .  ", end="")
+                    else:
+                        # Si un pion se trouve en (i,j) et qu'il y a un mur vertical qui passe à cet endroit:
+                        if (i,j)==(game_state.player1.i,game_state.player1.j) and (game_state.board.walls_v[i, j]==1 or game_state.board.walls_v[i-1, j]==1):
+                            print("  o |", end="")
+                        elif (i,j)==(game_state.player2.i,game_state.player2.j) and (game_state.board.walls_v[i, j]==1 or game_state.board.walls_v[i-1, j]==1):
+                            print("  x |", end="")
+                        # Si pas de mur, mais pion présent en (i,j)
+                        elif (i,j)==(game_state.player1.i,game_state.player1.j):
+                            print("  o  ", end="")
+                        elif (i,j)==(game_state.player2.i,game_state.player2.j):
+                            print("  x  ", end="")
+                        else: # Si pas de pion
+                            # Si dernière colonne, pas de mur
+                            if j==size-1:
+                                print("  .  ", end="")
+                            else:
+                                # Sinon, il peut y avoir un mur, dans ce cas:
+                                if game_state.board.walls_v[i, j]==1 or game_state.board.walls_v[i-1, j]==1:
+                                    print("  . |", end="")
+                                else: # Si pas de mur, case basique
+                                    print("  .  ", end="")
             print("#") # Fin de la ligne
 
             # Interligne
@@ -79,16 +109,29 @@ def display_board(game_state: GameState) -> None:
                     if game_state.board.walls_h[i, j-1]==1:
                         print("-"*5, end="")
                     else: # Si pas de mur
-                        print("     ", end="")
+                        print(" "*5, end="")
+                
+                elif j==0:
+                    if game_state.board.walls_h[i, j]==1:
+                        print("-"*5, end="")
+                    # Mur vertical
+                    elif i==0 and game_state.board.walls_v[i, j]==1:
+                        print("    |", end="")
+                    elif game_state.board.walls_v[i, j]==1 or game_state.board.walls_v[i-1, j]==1:
+                        print("    |", end="")
+                    else: # si pas de mur
+                        print(" "*5, end="")
+
                 else: # Si pas dernière colonne, on regarde s'il y a des murs
                     # Mur horizontal
                     if game_state.board.walls_h[i, j]==1 or game_state.board.walls_h[i, j-1]==1:
                         print("-"*5, end="")
                     # Mur vertical
+                    elif i==0 and game_state.board.walls_v[i, j]==1:
+                        print("    |", end="")
                     elif game_state.board.walls_v[i, j]==1 or game_state.board.walls_v[i-1, j]==1:
                         print("    |", end="")
-                    # Pas de mur
-                    else:
+                    else: # Pas de mur
                         print("     ", end="")
         print("#")
 
