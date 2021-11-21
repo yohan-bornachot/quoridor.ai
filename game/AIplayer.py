@@ -7,7 +7,7 @@ class AIPlayer:
 
     def __init__(self, name, play_as, time_to_play) -> None:
         if name == "random":
-            self.ai = RandomAI(play_as, time_to_play)
+            self.ai = RandomAI(play_as, time_to_play)   
         #elif name=="minimax":
         #    self.ai = MinimaxAI(time_to_play, basic_objective)
         elif name == "greedy":
