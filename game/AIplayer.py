@@ -1,4 +1,4 @@
-from AI.random import RandomAI
+from AI.random_ai import RandomAI
 #from AI.min_max_ai import MinimaxAI 
 from AI.objectif_f import basic_objective
 

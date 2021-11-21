@@ -1,5 +1,5 @@
-from .ai import AI
 from random import randint
+from .ai import AI
 
 class RandomAI(AI):
 
