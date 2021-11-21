@@ -24,7 +24,7 @@ class Quoridor:
         self.ai2 = AIPlayer(ai2)
 
 
-        self.game_state = GameState(player1, player2, board, current_player)
+        self.game_state = GameState(player1, player2, board, self.size-1, self.size-1,  current_player)
 
     def game_over(self):
         if self.game_state.player1.i == self.game_state.player1.goal :

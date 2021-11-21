@@ -1,4 +1,7 @@
 import numpy as np
+
+from tools import course_in_width
+
 class Player:
 
     def __init__(self, i, j, nb_walls, goal) -> None:
@@ -41,47 +44,47 @@ class Player:
         """This function returns True if the opponent is just at the right of the current pawn
         and if there is no wall between them."""
         return (self.i==opponent.i and self.j==opponent.j-1 and 
-                walls[i, j]==0 and walls[i-1, j]==0)
+                walls[self.i, self.j]==0 and walls[self.i-1, self.j]==0)
     
     def is_opponent_left(self, walls:np.ndarray, opponent:Player) -> bool:
         """This function returns True if the opponent is just at the left of the current pawn
         and if there is no wall between them."""
         return (self.i==opponent.i and self.j==opponent.j+1 and 
-                walls[i, j-1]==0 and walls[i-1, j-1]==0)
+                walls[self.i, self.j-1]==0 and walls[self.i-1, self.j-1]==0)
 
     def is_opponent_up(self, walls:np.ndarray, opponent:Player) -> bool:
         """This function returns True if the opponent is just above the current pawn
         and if there is no wall between them."""
         return (self.i==opponent.i+1 and self.j==opponent.j and 
-                walls[i-1, j]==0 and walls[i-1, j-1]==0)
+                walls[self.i-1, self.j]==0 and walls[self.i-1, j-1]==0)
     
     def is_opponent_down(self, walls:np.ndarray, opponent:Player) -> bool:
         """This function returns True if the opponent is just under the current pawn
         and if there is no wall between them."""
         return (self.i==opponent.i-1 and self.j==opponent.j and 
-                walls[i, j]==0 and walls[i, j-1]==0)
+                walls[self.i, self.j]==0 and walls[self.i, self.j-1]==0)
     
     def possible_jump_right(self, walls: np.ndarray, opponent: Player) -> bool:
         """This function tests if it is possible to jump over the opponent pawn towards right"""
         board_size = len(walls) + 1
         return  (self.j+1<board_size-1 and
-                is_opponent_right(walls, opponent) and opponent.possible_left(walls, self))
+                self.is_opponent_right(walls, opponent) and opponent.possible_left(walls, self))
     
     def possible_jump_left(self, walls: np.ndarray, opponent: Player) -> bool:
         """This function tests if it is possible to jump over the opponent pawn towards left"""
         return  (self.j-1>0 and
-                 is_opponent_left(walls, opponent) and opponent.possible_left(walls, self))
+                 self.is_opponent_left(walls, opponent) and opponent.possible_left(walls, self))
 
     def possible_jump_up(self, walls: np.ndarray, opponent: Player) -> bool:
         """This function tests if it is possible to jump over the opponent pawn upward"""
         return  (self.i-1>0 and
-                 is_opponent_up(walls, opponent) and opponent.possible_up(walls, self))
+                 self.is_opponent_up(walls, opponent) and opponent.possible_up(walls, self))
     
     def possible_jump_down(self, walls: np.ndarray, opponent: Player) -> bool:
         """This function tests if it is possible to jump over the opponent pawn downward"""
         board_size = len(walls) + 1
         return  (self.i+1<board_size-1 and
-                 is_opponent_down(walls, opponent) and opponent.possible_down(walls, self))
+                 self.is_opponent_down(walls, opponent) and opponent.possible_down(walls, self))
         
     def possible_jump_diag_ur(self, walls_h: np.ndarray, walls_v:np.ndarray, opponent: Player) -> bool:
         """This function tests if it is possible to jump in diagonal (up-right)."""
@@ -115,6 +118,9 @@ class Player:
 
     def get_nb_wall(self):
         return self.nb_walls
+
+    def compute_objective(self, walls_h, walls_v):
+        return course_in_width(self.i, self.j, walls_h, walls_v, self.goal)
 
     """
     def set_position(self, i, j):
