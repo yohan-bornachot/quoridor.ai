@@ -1,9 +1,11 @@
 import numpy as np
 import time
+import sys
 from typing import List
 
-from ai import AI
-from gamestate import GameState
+from .ai import AI
+sys.path.append("..")
+from game.gamestate import GameState
 
 class MinimaxAI(AI):
 
@@ -11,7 +13,7 @@ class MinimaxAI(AI):
         super().__init__(time_to_play)
         self.objective_function = objective_function
 
-    def minimax(self, state: gamestate.GameState, remaining_time: float, maximize: bool) -> float:
+    def minimax(self, state: GameState, remaining_time: float, maximize: bool) -> float:
         t0 = time.time()
         eps = 10e-3
         if remaining_time<=eps or state.is_terminal():
