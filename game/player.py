@@ -46,7 +46,7 @@ class Player(Subplayer):
         return (self.j<board_size-1 and 
                 (self.i == board_size-1 or walls[self.i, self.j] == 0) and 
                 (self.i == 0 or walls[self.i-1,self.j]==0) and
-                (self.i != opponent.i or self.j != opponent.j - 1))
+                (self.i != opponent.i or self.j + 1 != opponent.j))
 
     def possible_left(self, walls: np.ndarray, opponent: Subplayer) -> bool:
         """This function tests if it is possible to go left"""
@@ -54,7 +54,7 @@ class Player(Subplayer):
         return (self.j>0 and 
                 (self.i == board_size-1 or walls[self.i, self.j-1] == 0) and 
                 (self.i == 0 or walls[self.i-1,self.j-1]==0) and
-                (self.i != opponent.i or self.j != opponent.j + 1))
+                (self.i != opponent.i or self.j - 1 != opponent.j))
 
     def possible_up(self, walls: np.ndarray,opponent: Subplayer) -> bool:
         """This function tests if it is possible to go upward"""
@@ -62,7 +62,7 @@ class Player(Subplayer):
         return (self.i>0 and 
                 (self.j == board_size-1 or walls[self.i-1, self.j] == 0) and 
                 (self.j == 0 or walls[self.i-1,self.j-1]==0) and
-                (self.i != opponent.i-1 or self.j != opponent.j))
+                (self.i - 1 != opponent.i or self.j != opponent.j))
 
     def possible_down(self, walls: np.ndarray, opponent: Subplayer) -> bool:
         """This function tests if it is possible to go downward"""
@@ -70,7 +70,7 @@ class Player(Subplayer):
         return (self.i<board_size-1 and
                 (self.j == board_size-1 or walls[self.i, self.j] == 0) and
                 (self.j == 0 or walls[self.i,self.j-1]==0) and
-                (self.i != opponent.i+1 or self.j != opponent.j))
+                (self.i + 1 != opponent.i or self.j != opponent.j))
     
     def is_opponent_right(self, walls:np.ndarray, opponent:Subplayer) -> bool:
         """This function returns True if the opponent is just at the right of the current pawn
@@ -104,7 +104,7 @@ class Player(Subplayer):
         """This function tests if it is possible to jump over the opponent pawn towards right"""
         board_size = len(walls) + 1
         return  (self.j+1<board_size-1 and
-                self.is_opponent_right(walls, opponent) and opponent.possible_left(walls, self))
+                self.is_opponent_right(walls, opponent) and opponent.possible_right(walls, self))
     
     def possible_jump_left(self, walls: np.ndarray, opponent: Subplayer) -> bool:
         """This function tests if it is possible to jump over the opponent pawn towards left"""

@@ -24,8 +24,8 @@ class Quoridor:
         player2 = Player(self.size-1, self.size//2, nb_walls, 0)
         board = Board(self.size, wall_size, np.zeros((size-1, size-1)), np.zeros((size-1, size-1)))
 
-        self.ai1 = AIPlayer(ai1, play_as=1, time_to_play=time_to_play)
-        self.ai2 = AIPlayer(ai2, play_as=2, time_to_play=time_to_play)
+        self.ai1 = AIPlayer(ai1, play_as=1, time_to_play=time_to_play, gamma = 0.1)
+        self.ai2 = AIPlayer(ai2, play_as=2, time_to_play=time_to_play, gamma = 0.3)
 
 
         self.game_state = GameState(player1, player2, board, self.size-1, self.size-1,  current_player)
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     for _ in range(1):
-        q = Quoridor(args.ai1, args.ai2)
+        q = Quoridor(args.ai1, args.ai2, size=21)
         q.play(verbose=True)
 
         print("Winner is player : {}. Number of steps : {}. Temps joué {}".format(q.get_winner(),q.get_nb_step(), q.game_stop-q.game_start))
