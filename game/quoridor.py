@@ -13,7 +13,7 @@ from display import display_board
 
 class Quoridor:
 
-    def __init__(self, ai1, ai2, size = 9, nb_walls = 10, wall_size = 2, time_to_play = 2) -> None:
+    def __init__(self, ai1, ai2, size = 9, nb_walls = 10, wall_size = 2, time_to_play = 1) -> None:
         self.nb_step = 0
 
         self.size = size
@@ -24,7 +24,7 @@ class Quoridor:
         player2 = Player(self.size-1, self.size//2, nb_walls, 0)
         board = Board(self.size, wall_size, np.zeros((size-1, size-1)), np.zeros((size-1, size-1)))
 
-        self.ai1 = AIPlayer(ai1, play_as=1, time_to_play=time_to_play, gamma = 0.1)
+        self.ai1 = AIPlayer(ai1, play_as=1, time_to_play=time_to_play, gamma = 0.2)
         self.ai2 = AIPlayer(ai2, play_as=2, time_to_play=time_to_play, gamma = 0.3)
 
 
@@ -46,10 +46,10 @@ class Quoridor:
 
 
             if current_player == 1:
-                next_step = self.ai1.select_next_step(next_states)
+                next_step = self.ai1.select_next_step(self.game_state, next_states)
 
             if current_player == 2:
-                next_step = self.ai2.select_next_step(next_states)
+                next_step = self.ai2.select_next_step(self.game_state, next_states)
 
             self.game_state = next_step
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     for _ in range(1):
-        q = Quoridor(args.ai1, args.ai2, size=21)
+        q = Quoridor(args.ai1, args.ai2)
         q.play(verbose=True)
 
         print("Winner is player : {}. Number of steps : {}. Temps joué {}".format(q.get_winner(),q.get_nb_step(), q.game_stop-q.game_start))
