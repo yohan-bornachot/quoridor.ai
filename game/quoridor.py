@@ -13,7 +13,7 @@ from display import display_board
 
 class Quoridor:
 
-    def __init__(self, ai1, ai2, size = 9, nb_walls = 10, wall_size = 2, time_to_play = 5) -> None:
+    def __init__(self, ai1, ai2, size = 9, nb_walls = 10, wall_size = 2, time_to_play = 2) -> None:
         self.nb_step = 0
 
         self.size = size
@@ -69,10 +69,10 @@ class Quoridor:
 
 if __name__ == "__main__":
 
-    ai_types = ["random", "minimax", "greedy"]
+    ai_types = ["random", "minimax", "greedy", "sortAI"]
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ai1", default="greedy", choices=ai_types, help="player1 AI to be implemented")
-    parser.add_argument("--ai2", default="greedy", choices=ai_types, help="player2 AI to be implemented")
+    parser.add_argument("--ai1", default="minimax", choices=ai_types, help="player1 AI to be implemented")
+    parser.add_argument("--ai2", default="minimax", choices=ai_types, help="player2 AI to be implemented")
     args = parser.parse_args()
 
     for _ in range(1):

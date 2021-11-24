@@ -9,13 +9,13 @@ from game.gamestate import GameState
 
 class MinimaxAI(AI):
 
-    def __init__(self, time_to_play, objective_function) -> None:
-        super().__init__(time_to_play)
+    def __init__(self, objective_function, play_as, time_to_play: float) -> None:
+        super().__init__(play_as, time_to_play)
         self.objective_function = objective_function
 
     def minimax(self, state: GameState, remaining_time: float, maximize: bool) -> float:
         t0 = time.time()
-        eps = 10e-3
+        eps = 10e-2
         if remaining_time<=eps or state.is_terminal():
             value = self.objective_function(state.objective1, 
                                             state.objective2,
@@ -26,23 +26,25 @@ class MinimaxAI(AI):
         if maximize:
             value = -np.Infinity
             for next_state in next_gamestates:
-                remaining_time = remaining_time - (time.time()-t0)/len(next_gamestates)
-                value = max(value, minimax(next_state, remaining_time, False))
+                remaining_time -= (time.time()-t0)
+                remaining_time /= len(next_gamestates)
+                value = max(value, self.minimax(next_state, remaining_time, False))
             return value
         else: # minimizing player
             value = np.Infinity
             for next_state in next_gamestates:
-                remaining_time = remaining_time - (time.time()-t0)/len(next_gamestates)
-                value = min(value, minimax(next_state, remaining_time, False))
+                remaining_time = (time.time()-t0)
+                remaining_time /= len(next_gamestates)
+                value = min(value, self.minimax(next_state, remaining_time, True))
             return value
 
 
-    def select_next_step(self, next_steps: List[GameState], remaining_time: float, maximize: bool)\
-    -> GameState:
+    def select_next_step(self, next_steps: List[GameState]) -> GameState:
         best_val = 0
         best_index = 0
         for i in range(len(next_steps)):
-            value = minimax(next_steps[i], remaining_time, maximize)
+            maximize = (self.play_as==1)
+            value = self.minimax(next_steps[i], self.time_to_play, maximize)
             if value > best_val and maximize:
                 best_val = value
                 best_index = i
