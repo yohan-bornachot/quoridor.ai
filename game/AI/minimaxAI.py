@@ -1,6 +1,7 @@
 import numpy as np
 import time
 import sys
+from random import shuffle
 from typing import List
 
 from .ai import AI
@@ -20,7 +21,6 @@ class MinimaxAI(AI):
         t0 = time.time()
         eps = 5*10e-3
         if remaining_time<=eps or state.is_terminal():
-            #print(depth)
             value = self.objective_function(state.objective1, 
                                             state.objective2,
                                             state.player1.get_nb_wall(),
@@ -32,20 +32,17 @@ class MinimaxAI(AI):
         for futur_state in next_gamestates:
             ev_dist = basic_heuristic(futur_state.objective1, futur_state.objective2, state.objective1, state.objective2)
             if ev_dist*(1 if maximize else -1) > (0 if len(pruned_states)>0 else -1):
-                pruned_states.append(state)
+                pruned_states.append(futur_state)
         n = len(pruned_states)
+        shuffle(pruned_states)
 
         f = max if maximize else min
-        try :
-            value = self.minimax(next_gamestates[0], (remaining_time - time.time() + t0)/n, not maximize, depth +1)
-            for i in range(1,n):
-                given_time = (remaining_time - time.time() + t0)/(n-i)
-                value = f(value, self.minimax(pruned_states[i], given_time, not maximize, depth + 1))
-            return value
-        except :
-            print([basic_heuristic(futur_state.objective1, futur_state.objective2, state.objective1, state.objective2) for state in next_gamestates])
-
-
+        value = self.minimax(next_gamestates[0], (remaining_time - time.time() + t0)/n, not maximize, depth +1)
+        for i in range(1,n):
+            given_time = (remaining_time - time.time() + t0)/(n-i)
+            value = f(value, self.minimax(pruned_states[i], given_time, not maximize, depth + 1))
+        return value
+        
     def select_next_step(self, game_state, next_steps: List[GameState]) -> GameState:
         start = time.time()
         maximize = (self.play_as == 1)
@@ -61,7 +58,7 @@ class MinimaxAI(AI):
         if n == 1:
             return pruned_states[0]
 
-        print(n)
+        shuffle(pruned_states)
 
         f = max if maximize else min
 
