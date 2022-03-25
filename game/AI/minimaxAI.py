@@ -6,7 +6,7 @@ from typing import List
 
 from .ai import AI
 sys.path.append("..")
-from game.gamestate import GameState
+from gamestate import GameState
 
 def basic_heuristic(D1, D2, d1, d2):
     return d1 - D1 + D2 - d2
@@ -50,7 +50,7 @@ class MinimaxAI(AI):
         return value
 
         
-    def select_next_step(self, game_state, next_steps: List[GameState]) -> GameState:
+    def select_next_step(self, game_state: GameState, next_steps: List[GameState]) -> GameState:
         start = time.time()
         other = (self.play_as + 1)%game_state.nb_players
 

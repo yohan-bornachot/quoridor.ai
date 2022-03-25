@@ -121,8 +121,6 @@ class GameState:
                             self.possible_moves.append("v{}{}".format(k,l))
                             next_steps.append(GameState(next_players, next_board, next_obj, (self.current_player_idx+1)%self.nb_players))
 
-        
-
         return next_steps
     
     def is_terminal(self):

@@ -10,8 +10,14 @@ class SortAI(AI):
 
     def select_next_step(self, game_state, next_steps):
         other = (self.play_as+1)%2
-        print(self.play_as, other)
-        eval = [self.objective_function(state.objectives[self.play_as], state.objectives[other]-1,
-        state.players[self.play_as].get_nb_wall(), state.players[other].get_nb_wall(), self.gamma) for state in next_steps]
+
+        eval = [self.objective_function(
+                    state.objectives[self.play_as], 
+                    state.objectives[other]-1,
+                    state.players[self.play_as].get_nb_wall(), 
+                    state.players[other].get_nb_wall(), 
+                    self.gamma) 
+                for state in next_steps]
+
         return next_steps[argmax(eval)]
     

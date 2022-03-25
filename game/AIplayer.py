@@ -1,6 +1,7 @@
 from AI.randomAI import RandomAI
 from AI.sortAI import SortAI
-from AI.minimaxAI import MinimaxAI 
+from AI.minimaxAI import MinimaxAI
+from AI.mctsAI import MctsAI
 from AI.objectif_f import basic_objective
 
 class AIPlayer:
@@ -15,9 +16,11 @@ class AIPlayer:
         elif name=="minimax":
            self.ai = MinimaxAI(basic_objective, play_as, time_to_play)
         elif name == "greedy":
-            self.ai = SortAI(basic_objective, play_as, time_to_play)
+            self.ai = SortAI(basic_objective, gamma, play_as, time_to_play)
         elif name == "sortAI":
             self.ai = SortAI(basic_objective, gamma, play_as, time_to_play, *args, **kwargs)
+        # elif name == "mctsAI":
+        #     self.ai = MctsAI(, play_as, time_to_play, *args, **kwargs)
 
     def select_next_step(self,game_state, next_steps):
         return self.ai.select_next_step(game_state, next_steps)
