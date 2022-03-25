@@ -13,22 +13,35 @@ from display import display_board
 
 class Quoridor:
 
-    def __init__(self, ai1, ai2, size = 9, nb_walls = 10, wall_size = 2, time_to_play = 2) -> None:
+    def __init__(self, AIs, nb_players = 2, size = 9, nb_walls = 20, wall_size = 2, time_to_play = 2, gammas = None) -> None:
+
+        self.nb_players = nb_players
+
+        if gammas == None:
+            gammas = [0.3 for _ in range(self.nb_players)]
+        
         self.nb_step = 0
 
         self.size = size
         self.time_to_play = time_to_play
 
+        self.nb_walls = nb_walls//nb_players
+
         current_player = 0
-        players = [Player(0, self.size//2, nb_walls, self.size-1),
-                    Player(self.size-1, self.size//2, nb_walls, 0)]
+        if self.nb_players == 2 :
+            players = [Player(0, self.size//2, self.nb_walls, self.size-1, None),
+                        Player(self.size-1, self.size//2, self.nb_walls, 0, None)]
+        elif self.nb_players == 4 : 
+            players = [Player(0, self.size//2, self.nb_walls, self.size-1, None),
+                        Player(self.size-1, self.size//2, self.nb_walls, 0, None),
+                        Player(self.size//2, 0, self.nb_walls, None, self.size-1),
+                        Player(self.size//2, self.size-1, self.nb_walls, None, 0)]
+
         board = Board(self.size, wall_size, np.zeros((size-1, size-1)), np.zeros((size-1, size-1)))
 
-        self.ai1 = AIPlayer(ai1, play_as=0, time_to_play=time_to_play, gamma = 0.2)
-        self.ai2 = AIPlayer(ai2, play_as=1, time_to_play=time_to_play, gamma = 0.3)
+        self.AIs = [AIPlayer(AIs[i], play_as=i, time_to_play=time_to_play, gamma = gammas[i]) for i in range(self.nb_players)]
 
-
-        self.game_state = GameState(players, board, [self.size-1, self.size-1],  current_player)
+        self.game_state = GameState(players, board, [self.size for _ in range(self.nb_players)],  current_player)
 
     def play(self, verbose = True):
         self.game_start = time()
@@ -39,17 +52,13 @@ class Quoridor:
             
             if verbose : 
                 display_board(self.game_state)
-                #sleep(0.5)
+                print(self.game_state.objectives)
+                sleep(0.5)
 
             next_states = self.game_state.next_gamestates()
-            current_player = self.game_state.current_player
+            current_player_idx = self.game_state.current_player_idx
 
-
-            if current_player == 0:
-                next_step = self.ai1.select_next_step(self.game_state, next_states)
-
-            if current_player == 1:
-                next_step = self.ai2.select_next_step(self.game_state, next_states)
+            next_step = self.AIs[current_player_idx].select_next_step(self.game_state, next_states)
 
             self.game_state = next_step
 
@@ -58,10 +67,10 @@ class Quoridor:
         self.game_stop = time()
 
     def get_winner(self):
-        if self.game_state.players[0].i == self.game_state.players[0].goal :
-            return 1
-        if self.game_state.players[1].i == self.game_state.players[1].goal :
-            return 2
+        k = 0
+        while self.game_state.objectives[k]>0 : 
+            k+=1
+        return k
 
     def get_nb_step(self):
         return self.nb_step
@@ -69,15 +78,23 @@ class Quoridor:
 
 if __name__ == "__main__":
 
+    nb_players = [2, 4]
     ai_types = ["random", "minimax", "greedy", "sortAI"]
     parser = argparse.ArgumentParser()
-    parser.add_argument("--ai1", default="greedy", choices=ai_types, help="player1 AI to be implemented")
-    parser.add_argument("--ai2", default="greedy", choices=ai_types, help="player2 AI to be implemented")
+    parser.add_argument("--n", type=int, default= 2, choices= nb_players, help = "Number of players on the board")
+    parser.add_argument("--ai1", default="random", choices=ai_types, help="player1 AI to be implemented")
+    parser.add_argument("--ai2", default="random", choices=ai_types, help="player2 AI to be implemented")
+    parser.add_argument("--ai3", default="random", choices=ai_types, help="player3 AI to be implemented")
+    parser.add_argument("--ai4", default="random", choices=ai_types, help="player4 AI to be implemented")
+    parser.add_argument("--v", type=bool, default=False, help= "Set this variable to False if you don't need to see the board")
     args = parser.parse_args()
 
     for _ in range(1):
-        q = Quoridor(args.ai1, args.ai2)
-        q.play(verbose=False)
+        if args.n == 2:
+            q = Quoridor([args.ai1, args.ai2])
+        if args.n == 4 :
+            q = Quoridor([args.ai1, args.ai2, args.ai3, args.ai4], nb_players= 4)
+        q.play(verbose=args.v)
 
         print("Winner is player : {}. Number of steps : {}. Temps joué {}".format(q.get_winner(),q.get_nb_step(), q.game_stop-q.game_start))
         print("Mean time by step : {}".format((q.game_stop-q.game_start)/q.nb_step))
