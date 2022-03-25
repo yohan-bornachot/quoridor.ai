@@ -11,7 +11,7 @@ def display_board(game_state: GameState) -> None:
 
     first_str = "#"*5*size + "##  Nombre de murs restants : "
     for i in range(n_players):
-        first_str = first_str + " joueur{} {}".format(i,game_state.players[i].get_nb_wall())
+        first_str = first_str + " joueur_{} {} ;".format(i,game_state.players[i].get_nb_wall())
 
     print(first_str) # Ligne du haut
 
@@ -167,13 +167,3 @@ def display_board(game_state: GameState) -> None:
 #    #  .    .    .    .    x    .    .    .    .  #
 #    ###############################################
 
-if __name__== "__main__":
-    size = 9
-    players[0] = Player(0, size//2, 10)
-    players[1] = Player(size-1, size//2, 10)
-    board = Board(board_size=9, wall_size=2)
-    board.set_v_wall(1, 1)
-    board.set_h_wall(0, 0)
-    game_state = GameState(players[0], players[1], board, size, size)
-
-    display_board(game_state)

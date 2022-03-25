@@ -8,8 +8,11 @@ from .ai import AI
 sys.path.append("..")
 from gamestate import GameState
 
-def basic_heuristic(D1, D2, d1, d2):
-    return d1 - D1 + D2 - d2
+def basic_heuristic(futur_obj, current_obj, player):
+    n = len(futur_obj)
+    mask = np.ones((n))/(n-1)
+    mask[player] = - 1
+    return np.sum(mask*(np.array(futur_obj) - np.array(current_obj)))
 
 class MinimaxAI(AI):
 
@@ -21,22 +24,18 @@ class MinimaxAI(AI):
         t0 = time.time()
         eps = 10e-2
 
-        maximize = self.play_as == state.current_player
-
-        p = state.current_player
-        q = (p+1)%2
+        maximize = self.play_as == state.current_player_idx
 
         if remaining_time<=eps or state.is_terminal():
-            value = self.objective_function(state.objectives[q], 
-                                            state.objectives[p],
-                                            state.players[q].get_nb_wall(),
-                                            state.players[p].get_nb_wall())
+            value = self.objective_function(state, state.current_player_idx)
             return value
+
+
         next_gamestates = state.next_gamestates()
         
         pruned_states = list()
         for futur_state in next_gamestates:
-            ev_dist = basic_heuristic(futur_state.objectives[p], futur_state.objectives[q], state.objectives[p], state.objectives[q])
+            ev_dist = basic_heuristic(futur_state.objectives, state.objectives, state.current_player_idx)
             if ev_dist > (0 if len(pruned_states)>0 else -1):
                 pruned_states.append(futur_state)
         n = len(pruned_states)
@@ -52,13 +51,11 @@ class MinimaxAI(AI):
         
     def select_next_step(self, game_state: GameState, next_steps: List[GameState]) -> GameState:
         start = time.time()
-        other = (self.play_as + 1)%game_state.nb_players
 
         pruned_states = list()
         dist = list()
         for state in next_steps:
-            ev_dist = basic_heuristic(state.objectives[self.play_as], state.objectives[other],
-                        game_state.objectives[self.play_as], game_state.objectives[other])
+            ev_dist = basic_heuristic(state.objectives, game_state.objectives, self.play_as)
             dist.append(ev_dist)
             if ev_dist >(0 if len(pruned_states)>0 else -1) :
                 pruned_states.append(state)

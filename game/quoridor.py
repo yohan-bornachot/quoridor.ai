@@ -52,7 +52,6 @@ class Quoridor:
             
             if verbose : 
                 display_board(self.game_state)
-                print(self.game_state.objectives)
                 sleep(0.5)
 
             next_states = self.game_state.next_gamestates()
@@ -82,10 +81,10 @@ if __name__ == "__main__":
     ai_types = ["random", "minimax", "greedy", "sortAI"]
     parser = argparse.ArgumentParser()
     parser.add_argument("--n", type=int, default= 2, choices= nb_players, help = "Number of players on the board")
-    parser.add_argument("--ai1", default="random", choices=ai_types, help="player1 AI to be implemented")
-    parser.add_argument("--ai2", default="random", choices=ai_types, help="player2 AI to be implemented")
-    parser.add_argument("--ai3", default="random", choices=ai_types, help="player3 AI to be implemented")
-    parser.add_argument("--ai4", default="random", choices=ai_types, help="player4 AI to be implemented")
+    parser.add_argument("--ai1", default="minimax", choices=ai_types, help="player1 AI to be implemented")
+    parser.add_argument("--ai2", default="minimax", choices=ai_types, help="player2 AI to be implemented")
+    parser.add_argument("--ai3", default="sortAI", choices=ai_types, help="player3 AI to be implemented")
+    parser.add_argument("--ai4", default="sortAI", choices=ai_types, help="player4 AI to be implemented")
     parser.add_argument("--v", type=bool, default=False, help= "Set this variable to False if you don't need to see the board")
     args = parser.parse_args()
 

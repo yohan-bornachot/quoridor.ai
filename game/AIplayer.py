@@ -18,9 +18,13 @@ class AIPlayer:
         elif name == "greedy":
             self.ai = SortAI(basic_objective, gamma, play_as, time_to_play)
         elif name == "sortAI":
+<<<<<<< Updated upstream
             self.ai = SortAI(basic_objective, gamma, play_as, time_to_play, *args, **kwargs)
         # elif name == "mctsAI":
         #     self.ai = MctsAI(, play_as, time_to_play, *args, **kwargs)
+=======
+            self.ai = SortAI(basic_objective, gamma, play_as, time_to_play)
+>>>>>>> Stashed changes
 
     def select_next_step(self,game_state, next_steps):
         return self.ai.select_next_step(game_state, next_steps)
