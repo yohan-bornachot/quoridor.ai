@@ -39,7 +39,7 @@ class Quoridor:
 
         board = Board(self.size, wall_size, np.zeros((size-1, size-1)), np.zeros((size-1, size-1)))
 
-        self.AIs = [AIPlayer(AIs[i], play_as=i, time_to_play=time_to_play, gamma = gammas[i]) for i in range(self.nb_players)]
+        self.AIs = [AIPlayer(AIs[i], play_as=i, time_to_play=time_to_play, gamma = gammas[i], board_size = size) for i in range(self.nb_players)]
 
         self.game_state = GameState(players, board, [self.size for _ in range(self.nb_players)],  current_player)
 
@@ -66,10 +66,7 @@ class Quoridor:
         self.game_stop = time()
 
     def get_winner(self):
-        k = 0
-        while self.game_state.objectives[k]>0 : 
-            k+=1
-        return k
+        return self.game_state.get_winner()
 
     def get_nb_step(self):
         return self.nb_step

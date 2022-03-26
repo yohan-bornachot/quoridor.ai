@@ -9,19 +9,6 @@ class SortAI(AI):
 
 
     def select_next_step(self, game_state, next_steps):
-<<<<<<< Updated upstream
-        other = (self.play_as+1)%2
-
-        eval = [self.objective_function(
-                    state.objectives[self.play_as], 
-                    state.objectives[other]-1,
-                    state.players[self.play_as].get_nb_wall(), 
-                    state.players[other].get_nb_wall(), 
-                    self.gamma) 
-                for state in next_steps]
-
-=======
         eval = [self.objective_function(state, self.play_as) for state in next_steps]
->>>>>>> Stashed changes
         return next_steps[argmax(eval)]
     

@@ -1,15 +1,14 @@
 from AI.randomAI import RandomAI
 from AI.sortAI import SortAI
 from AI.minimaxAI import MinimaxAI
-from AI.mctsAI import MctsAI
+from AI.DQNAi import DQN
 from AI.objectif_f import basic_objective
 
 class AIPlayer:
 
-    def __init__(self, name, play_as, time_to_play, *args, **kwargs) -> None:
+    def __init__(self, name, play_as, time_to_play, board_size, *args, **kwargs) -> None:
 
-        if "gamma" in kwargs.keys():
-            gamma = kwargs["gamma"]
+        gamma = kwargs.get("gamma")
 
         if name == "random":
             self.ai = RandomAI(play_as, time_to_play)   
@@ -18,13 +17,14 @@ class AIPlayer:
         elif name == "greedy":
             self.ai = SortAI(basic_objective, gamma, play_as, time_to_play)
         elif name == "sortAI":
-<<<<<<< Updated upstream
-            self.ai = SortAI(basic_objective, gamma, play_as, time_to_play, *args, **kwargs)
-        # elif name == "mctsAI":
-        #     self.ai = MctsAI(, play_as, time_to_play, *args, **kwargs)
-=======
             self.ai = SortAI(basic_objective, gamma, play_as, time_to_play)
->>>>>>> Stashed changes
+        
+        # TODO
+        #elif name == "DQN" : 
+        #    self.ai = DQN(play_as, time_to_play, board_size, )
 
     def select_next_step(self,game_state, next_steps):
         return self.ai.select_next_step(game_state, next_steps)
+
+    def switch_player(self, play_as):
+        self.ai.switch_player(play_as)
