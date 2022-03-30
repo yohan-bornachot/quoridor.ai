@@ -10,6 +10,8 @@ from torch import load, no_grad, save, tensor, unsqueeze, vstack
 import numpy as np
 import random as rd
 from datetime import datetime
+from copy import deepcopy
+
 
 class DQNTrainer : 
     def __init__(self):
@@ -23,7 +25,7 @@ class DQNTrainer :
         if  PATH != None:
             self.net.load_state_dict(load(PATH))
 
-        self.ai = DQN(play_as=0, time_to_play=5, board_size=config["game"]["board_size"], nb_walls=config["game"]["nb_walls"], check_licit=False, eps = config["learning"]["eps"],
+        self.ai = DQN(play_as=0, time_to_play=5, board_size=config["game"]["board_size"], nb_walls=config["game"]["nb_walls"], check_licit=False,  eps = config["learning"]["eps"],
         eps_decay=config["learning"]["eps_decay"],min_eps=config["learning"]["eps_min"], gamma=config["learning"]["gamma"],
         network=self.net, lr = config["learning"]["lr"] )
 
@@ -49,6 +51,7 @@ class DQNTrainer :
         self.next_state_stack = list()
         self.reward_stack = list()
         self.action_stack = list()
+        self.illegal_count = 0
 
     
     def init_game(self):
@@ -78,6 +81,7 @@ class DQNTrainer :
                 idx_action = self.ai.policy(self.game_state)
             legal = self.ai.legal_move(self.game_state, idx_action)
             if legal == None :
+                self.illegal_count += 1
                 self.state_stack.append(self.game_state)
                 self.next_state_stack.append(self.game_state)
                 self.action_stack.append(idx_action)
@@ -200,6 +204,7 @@ class DQNTrainer :
         self.next_state_stack = list()
         self.reward_stack = list()
         self.action_stack = list()
+        self.illegal_count = 0
 
     def train_dqn(self):
         for training in range(self.nb_training):
@@ -218,9 +223,11 @@ class DQNTrainer :
             batches = self.create_batches()
             
             print("Entrainement sur le dataset")
+            loss = 0
             for batch in batches:
                 states, rewards, next_states, actions = batch
-                self.ai.train_on_batch(states, rewards, next_states, actions)
+                loss += self.ai.train_on_batch(states, rewards, next_states, actions)
+            print("Loss : {}, proportion d'actions illégales : {}".format(loss/len(batches),self.illegal_count/len(self.action_stack)))
 
             self.ai.decrease_eps()
             self.ai.update_target()
@@ -229,10 +236,12 @@ class DQNTrainer :
             
             if (training+1)%10 == 0 :
                 date = str(datetime.today()).split('.')[0].replace(' ','_')
-                save(self.ai.net.state_dict(), self.path_to_save+date+"_epoch{}.h5".format(training))
+                cpu_net = deepcopy(self.ai.net).to("cpu")
+                save(cpu_net.state_dict(), self.path_to_save+date+"_epoch{}.h5".format(training))
                 
         print("Fin de l'entrainement, nombre de parties jouées : {}".format(self.nb_games))
 
         date = str(datetime.today()).split('.')[0].replace(' ','_')
-        save(self.ai.net.state_dict(), self.path_to_save+date+".h5")
+        cpu_net = deepcopy(self.ai.net).to("cpu")
+        save(cpu_net.state_dict(), self.path_to_save+date+".h5")
         

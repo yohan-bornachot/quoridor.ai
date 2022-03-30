@@ -75,10 +75,10 @@ class Quoridor:
 if __name__ == "__main__":
 
     nb_players = [2, 4]
-    ai_types = ["random", "minimax", "greedy", "sortAI"]
+    ai_types = ["random", "minimax", "greedy", "sortAI", "dqn"]
     parser = argparse.ArgumentParser()
     parser.add_argument("--n", type=int, default= 2, choices= nb_players, help = "Number of players on the board")
-    parser.add_argument("--ai1", default="minimax", choices=ai_types, help="player1 AI to be implemented")
+    parser.add_argument("--ai1", default="dqn", choices=ai_types, help="player1 AI to be implemented")
     parser.add_argument("--ai2", default="minimax", choices=ai_types, help="player2 AI to be implemented")
     parser.add_argument("--ai3", default="sortAI", choices=ai_types, help="player3 AI to be implemented")
     parser.add_argument("--ai4", default="sortAI", choices=ai_types, help="player4 AI to be implemented")

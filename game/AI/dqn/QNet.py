@@ -1,8 +1,7 @@
-from torch import nn, reshape, hstack
+from torch import nn, reshape, hstack, clone
 
 class QNet(nn.Module):
-    def __init__(self, board_size, nb_channels, kernel_size, mlp_sizes, nb_futur_states
-    ) -> None:
+    def __init__(self, board_size, nb_channels, kernel_size, mlp_sizes, nb_futur_states) -> None:
         super().__init__()
         
         self.board_size = board_size
@@ -18,6 +17,7 @@ class QNet(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2)) for i in range(self.nb_conv_layers)]
         )
+        
 
         self.mlp = nn.ModuleList(
             [nn.Sequential(
@@ -30,13 +30,16 @@ class QNet(nn.Module):
     
     def forward(self, board, positions, goals, nb_walls):
         
-        x = self.conv_pool(board)
+        x = clone(board)
+        for i in range(len(self.conv_pool)):
+            x = self.conv_pool[i](x)
         
         b, c, h, w = x.shape
         x = reshape(x, (b, c*h*w))
         x = hstack((x,positions,goals,nb_walls))
-
-        x = self.mlp(x)
+        
+        for i in range(len(self.mlp)):
+            x = self.mlp[i](x)
 
         x = self.head(x)
 

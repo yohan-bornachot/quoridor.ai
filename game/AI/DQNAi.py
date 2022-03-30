@@ -3,10 +3,10 @@ from torch.optim import Adam
 import random as rd
 import copy
 
-from ai import AI
+from .ai import AI
 
 class DQN(AI):
-    def __init__(self, play_as, time_to_play, board_size, check_licit, eps, eps_decay, min_eps, gamma, network, lr) -> None:
+    def __init__(self, play_as, time_to_play, board_size, nb_walls, check_licit, eps, eps_decay, min_eps, gamma, network, lr) -> None:
         super().__init__(play_as, time_to_play)
 
         self.eps = eps 
@@ -19,10 +19,11 @@ class DQN(AI):
         self.check_licit = check_licit
 
         self.net = network
-        self.target_net = copy.deepcopy(self.net)
         self.lr = lr
         self.optimizer = Adam(self.net.parameters(), lr=self.lr)
         self.loss_fn = nn.MSELoss()
+
+        self.nb_walls = nb_walls
 
         self.use_cuda = cuda.is_available()
         if self.use_cuda:
@@ -32,10 +33,12 @@ class DQN(AI):
         self.device = device
 
         self.net.to(device)
+        self.target_net = copy.deepcopy(self.net)
+        
 
         self.state_list = ["u", "d", "l", "r", "uu", "dd", "ll", "rr", "ur", "ul", "dr", "dl"]
-        + ["h{}.{}".format(i%self.board_size,i//self.board_size) for i in range(self.board_size**2)]
-        + ["v{}.{}".format(i%self.board_size,i//self.board_size) for i in range(self.board_size**2)]
+        self.state_list = self.state_list + ["h{}.{}".format(i%self.board_size,i//self.board_size) for i in range(self.board_size**2)]
+        self.state_list = self.state_list + ["v{}.{}".format(i%self.board_size,i//self.board_size) for i in range(self.board_size**2)]
 
 
     def policy(self, state):
@@ -44,22 +47,22 @@ class DQN(AI):
         else :
             c_1 = unsqueeze(tensor(state.board.walls_h),0)
             c_2 = unsqueeze(tensor(state.board.walls_v),0)
-            c = vstack((c_1,c_2)).to(self.device).float()
+            c = unsqueeze(vstack((c_1,c_2)),0).to(self.device).float()
 
             n = state.board.board_size + 1
 
-            nb_walls = [state.players[self.play_as].get_nb_walls()]
-            pos = [state.players[self.play_as].i, state.players[self.play_as].i]
+            nb_walls = [state.players[self.play_as].get_nb_wall()]
+            pos = [state.players[self.play_as].i, state.players[self.play_as].j]
             goals = [state.players[self.play_as].goal_i]
             for i,player in enumerate(state.players):
                 if i!=self.play_as:
-                    nb_walls.append(player.get_nb_walls())
+                    nb_walls.append(player.get_nb_wall())
                     pos.append(player.i)
                     pos.append(player.j)
                     goals.append(player.goal_i)
-            nb_walls = tensor(nb_walls).to(self.device).float()
-            pos = (tensor(pos)/n).to(self.device).float()
-            goals = (tensor(goals)/n).to(self.device).float()
+            nb_walls = unsqueeze(tensor(nb_walls)/self.nb_walls,0).to(self.device).float()
+            pos = unsqueeze(tensor(pos)/n,0).to(self.device).float()
+            goals = unsqueeze(tensor(goals)/n,0).to(self.device).float()
 
             return argmax(self.net.forward(c, pos, goals, nb_walls))
 
@@ -79,6 +82,7 @@ class DQN(AI):
         legal = self.legal_move(game_state, idx)
 
         if self.check_licit and legal == None:
+            print("mauvaise action")
             return next_steps[rd.randint(0, len(next_steps)-1)]
         
         return next_steps[legal]
@@ -88,10 +92,10 @@ class DQN(AI):
     
     def train_on_batch(self, states, rewards, next_states, actions):
         c, pos, goals, nb_walls = next_states
-        c = c.float()
-        pos = pos.float()
-        goals = goals.float()
-        nb_walls = nb_walls.float()
+        c = c.to(self.device).float()
+        pos = pos.to(self.device).float()
+        goals = goals.to(self.device).float()
+        nb_walls = nb_walls.to(self.device).float()
         with no_grad() :
             target = self.target_net(c, pos, goals, nb_walls)
             target = max(target, 1)[0]
@@ -104,10 +108,10 @@ class DQN(AI):
         mask = mask.to(self.device).float()
 
         c, pos, goals, nb_walls = states
-        c = c.float()
-        pos = pos.float()
-        goals = goals.float()
-        nb_walls = nb_walls.float()
+        c = c.to(self.device).float()
+        pos = pos.to(self.device).float()
+        goals = goals.to(self.device).float()
+        nb_walls = nb_walls.to(self.device).float()
         pred = self.net(c, pos, goals, nb_walls)
         pred = sum(mul(pred, mask), 1)
 
