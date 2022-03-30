@@ -1,7 +1,7 @@
 from torch import nn, reshape, hstack, clone
 
 class QNet(nn.Module):
-    def __init__(self, board_size, nb_channels, kernel_size, mlp_sizes, nb_futur_states) -> None:
+    def __init__(self, board_size, nb_channels, kernel_size, mlp_sizes, nb_futur_states, used_for = "reward") -> None:
         super().__init__()
         
         self.board_size = board_size
@@ -26,7 +26,11 @@ class QNet(nn.Module):
             ) for i in range(self.nb_mlp_layers)]
         )
 
-        self.head = nn.Linear(self.mlp_sizes[-1],nb_futur_states)
+        if used_for == "reward": 
+            self.head = nn.Linear(self.mlp_sizes[-1],nb_futur_states)
+        elif used_for == "rules":
+            self.head = nn.Sequential(nn.Linear(self.mlp_sizes[-1],nb_futur_states),
+            nn.Sigmoid())
     
     def forward(self, board, positions, goals, nb_walls):
         
