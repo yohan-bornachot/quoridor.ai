@@ -154,11 +154,19 @@ class DQNV2(AI):
         nb_walls = nb_walls.to(self.device).float()
         target = target.to(self.device).float()
         rules = self.rules_net.forward(c, pos, goals, nb_walls)
+        verbose = False
+        if verbose == True :
+            print("Rules predicted : {}".format(rules.shape))
+            print(rules)
+            print("Target : {}".format(target.shape))
+            print(target)
+            
+            assert False
 
         loss = self.rules_loss_fn(rules, target)
         self.rules_optimizer.zero_grad()
         loss.backward()
-        self.rules_optimizer.step
+        self.rules_optimizer.step()
 
         return loss.item()
 

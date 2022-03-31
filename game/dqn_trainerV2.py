@@ -6,14 +6,14 @@ from player import Player
 from board import Board
 from gamestate import GameState
 
-from torch import load, no_grad, save, tensor, unsqueeze, vstack, argmax, where, ones_like, zeros_like
+from torch import load, no_grad, save, tensor, squeeze, unsqueeze, vstack, argmax, where, ones_like, zeros_like
 import numpy as np
 import random as rd
 from datetime import datetime
 from copy import deepcopy
 
 
-class DQNTrainer : 
+class DQNTrainerV2 : 
     def __init__(self):
 
         config = DQNConfig().config
@@ -30,7 +30,7 @@ class DQNTrainer :
 
         self.ai = DQNV2(play_as=0, time_to_play=5, board_size=config["game"]["board_size"], nb_walls=config["game"]["nb_walls"], check_licit=False,  eps = config["learning"]["eps"],
         eps_decay=config["learning"]["eps_decay"],min_eps=config["learning"]["eps_min"], gamma=config["learning"]["gamma"],
-        network=self.net, rules_network=self.rules_net, lr = config["learning"]["lr"] )
+        reward_network=self.net, rules_network=self.rules_net, lr = config["learning"]["lr"] )
 
         self.state_list = self.ai.get_state_list()
         self.state_dic = {}
@@ -86,16 +86,17 @@ class DQNTrainer :
             self.ai.switch_player(current_player_idx)
             with no_grad():
                 inputs = self.ai.from_state_to_network_inputs(self.game_state)
-                mask = self.ai.compute_rules(inputs) > tensor(self.ai.rules_threshold).to(self.ai.device)
+                mask = squeeze(self.ai.compute_rules(inputs)) > tensor(self.ai.rules_threshold).to(self.ai.device)
                 if rd.random()<self.ai.eps :
-                    tmp_idx = rd.randint(0, sum(mask).item())
-                    idx = 0 
+                    tmp_idx = rd.randint(0, sum(mask).item()-1)
+                    idx_action = 0 
                     while tmp_idx > 0:
-                        tmp_idx += - mask[idx].item()
-                        idx += 1
+                        tmp_idx += - mask[idx_action].item()
+                        idx_action += 1
                 else:
-                    rewards = self.ai.compute_rewards(inputs)
-                    idx = argmax(where(mask == 1, rewards, ones_like(rewards)*min(rewards)))
+                    rewards = squeeze(self.ai.compute_rewards(inputs))
+                    idx_action = argmax(where(mask == 1, rewards, ones_like(rewards)*min(rewards)))
+            
 
             legal = self.ai.legal_move(self.game_state, idx_action)
             if legal != None :
@@ -196,7 +197,7 @@ class DQNTrainer :
 
 
     def create_rules_batches(self):
-        nb_samples = len(self.action_stack)
+        nb_samples = len(self.rules_target_stack)
         ind = [i for i in range(nb_samples)]
         batch_list = list()
         while len(ind)>self.batch_size:
@@ -211,7 +212,6 @@ class DQNTrainer :
         for batch in batch_list:
             states = self.create_states_tensors(batch, "rules")
             targets = vstack([self.rules_target_stack[idx] for idx in batch])
-            targets = self.rules_target_stack
             training_batches.append((states, targets))
         return training_batches
 
@@ -227,24 +227,30 @@ class DQNTrainer :
 
     def train_dqn(self):
         for training in range(self.nb_training):
-            print("Training {}/{}".format(training,self.nb_training))
+            print("## Training {}/{} ##".format(training,self.nb_training))
 
             self.reset_stacks()
 
             print("Creation du dataset : jeu")
-            while len(self.action_stack) < self.nb_samples_to_train:
+            while len(self.rules_state_stack) < self.nb_samples_to_train:
+                print("\rProcessus effectué à {}%".format(round(100*len(self.rules_state_stack) / self.nb_samples_to_train,4)), end = "")
                 self.init_game()
                 self.play_game()
                 self.nb_games += 1
                 
-            print("Proportion d'actions illégales : {}".format(1-len(self.action_stack)/len(self.rules_state_stack)))
+            print("")
+            
+            print("Proportion d'actions illégales : {}%".format(round(100*(1-len(self.action_stack)/len(self.rules_state_stack)))))
             print("Entrainement du réseau REWARDS")
             batches = self.create_batches()
             loss = 0
             for batch in batches:
                 states, rewards, next_states, actions = batch
                 loss += self.ai.train_rewards_on_batch(states, rewards, next_states, actions)
-            print("Loss : {}".format(loss/len(batches)))
+            if len(batches) > 0 :
+                print("Loss : {}".format(loss/len(batches)))
+            else :
+                print("Pas assez de données au cours de cette passe.")
 
             print("Entrainement du réseau RULES")
             batches = self.create_rules_batches()
@@ -253,7 +259,7 @@ class DQNTrainer :
                 states, targets = batch
                 loss += self.ai.train_rules_on_batch(states, targets)
             print("Loss : {}".format(loss/len(batches)))
-
+            
 
             self.ai.decrease_eps()
             self.ai.update_target()
@@ -266,6 +272,8 @@ class DQNTrainer :
                 save(cpu_net.state_dict(), self.path_to_save+"rewards_"+date+"_epoch{}.h5".format(training))
                 cpu_net = deepcopy(self.ai.rules_net).to("cpu")
                 save(cpu_net.state_dict(), self.path_to_save+"rules_"+date+"_epoch{}.h5".format(training))
+            
+            print("")
                 
         print("Fin de l'entrainement, nombre de parties jouées : {}".format(self.nb_games))
 
